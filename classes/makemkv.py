@@ -17,7 +17,7 @@ import datetime
 import re
 import subprocess
 import time
-
+import codecs
 import logger
 
 
@@ -85,25 +85,23 @@ class MakeMKV(object):
         """
         toreturn = []
 
-        with open('/tmp/makemkvMessages', 'r') as messages:
+        with codecs.open('/tmp/makemkvMessages', 'r', 'utf-8') as messages:
             for line in messages:
                 if line[:len(stype)] == stype:
-                    values = line.replace("%s:" % stype, "").strip()
+                    values = line.replace(u"%s:" % stype, u"").strip()
 
-                    cr = csv.reader([values])
+                    cr = values.split(u',')
 
                     if sid is not None:
-                        for row in cr:
-                            if int(row[0]) == int(sid):
-                                if scode is not None:
-                                    if int(row[1]) == int(scode):
-                                        toreturn.append(row[3])
-                                else:
-                                    toreturn.append(row[2])
+                        if int(cr[0]) == int(sid):
+                            if scode is not None:
+                                if int(cr[1]) == int(scode):
+                                    toreturn.append(cr[3].strip('"'))
+                            else:
+                                toreturn.append(cr[2].strip('"'))
 
                     else:
-                        for row in cr:
-                            toreturn.append(row[0])
+                        toreturn.append(cr[0].strip('"'))
 
         return toreturn
 
@@ -257,11 +255,11 @@ class MakeMKV(object):
             return []
 
         # Passed the simple tests, now check for disk drives
-        lines = results.split("\n")
+        lines = results.split(u"\n")
         for line in lines:
             if line[:4] == "DRV:":
                 if "/dev/" in line:
-                    out = line.decode('utf-8').split(',')
+                    out = line.split(u',')
 
                     if len(out[5]) > 3:
 
@@ -323,7 +321,7 @@ class MakeMKV(object):
         if foundtitles > 0:
             for titleNo in set(self._read_mkv_messages("TINFO")):
                 durTemp = self._read_mkv_messages("TINFO", titleNo, 9)[0]
-                x = time.strptime(durTemp, '%H:%M:%S')
+                x = time.strptime(durTemp, u'%H:%M:%S')
                 titleDur = datetime.timedelta(
                     hours=x.tm_hour,
                     minutes=x.tm_min,
