@@ -164,6 +164,12 @@ class MakeMKV(object):
 
         (results, errors) = proc.communicate()
 
+        if results is not None:
+            results = results.decode('utf-8')
+
+        if errors is not None:
+            errors = errors.decode('utf-8')
+
         if proc.returncode is not 0:
             self.log.error(
                 "MakeMKV (rip_disc) returned status code: %d" % proc.returncode)
@@ -227,6 +233,12 @@ class MakeMKV(object):
 
         (results, errors) = proc.communicate()
 
+        if results is not None:
+            results = results.decode('utf-8')
+
+        if errors is not None:
+            errors = errors.decode('utf-8')
+
         if proc.returncode is not 0:
             self.log.error(
                 "MakeMKV (find_disc) returned status code: %d" % proc.returncode)
@@ -249,9 +261,9 @@ class MakeMKV(object):
         for line in lines:
             if line[:4] == "DRV:":
                 if "/dev/" in line:
-                    out = line.split(',')
+                    out = line.decode('utf-8').split(',')
 
-                    if len(str(out[5])) > 3:
+                    if len(out[5]) > 3:
 
                         drives.append(
                             {
@@ -287,6 +299,12 @@ class MakeMKV(object):
         )
 
         (results, errors) = proc.communicate()
+
+        if results is not None:
+            results = results.decode('utf-8')
+
+        if errors is not None:
+            errors = errors.decode('utf-8')
 
         if proc.returncode is not 0:
             self.log.error(
