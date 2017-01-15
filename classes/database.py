@@ -16,7 +16,6 @@ import os
 from datetime import datetime
 
 from peewee import *
-import utils
 
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 database = SqliteDatabase('%s/autorippr.sqlite' % DIR, **{})
@@ -162,8 +161,6 @@ def update_video(vidobj, statusid, filename=None):
     vidobj.lastupdated = datetime.now()
 
     if filename is not None:
-        filename = utils.strip_accents(filename)
-        filename = utils.clean_special_chars(filename)
         vidobj.filename = filename
 
     vidobj.save()

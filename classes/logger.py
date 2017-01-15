@@ -23,8 +23,8 @@ class Logger(object):
         self.silent = silent
 
         frmt = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            "%Y-%m-%d %H:%M:%S"
+            u'%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            u'Y-%m-%d %H:%M:%S'
         )
 
         if debug:

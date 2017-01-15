@@ -58,8 +58,9 @@ import subprocess
 import sys
 
 import yaml
-from classes import *
 from tendo import singleton
+
+from classes import *
 
 __version__ = "1.7.0"
 
@@ -109,7 +110,7 @@ def eject(config, drive):
 
     except Exception as ex:
         log.error("Could not detect OS or eject CD tray")
-        log.ex("An exception of type {} occured.".format(type(ex).__name__))
+        log.ex(u"An exception of type {} occured.".format(type(ex).__name__))
         log.ex("Args: \r\n {}".format(ex.args))
 
     finally:
@@ -175,7 +176,7 @@ def rip(config):
                             dvdTitle['title']
                         )
 
-                        log.debug("Attempting to rip {} from {}".format(
+                        log.debug(u"Attempting to rip {} from {}".format(
                             dvdTitle['title'],
                             disc_title
                         ))
@@ -188,19 +189,8 @@ def rip(config):
                             status = mkv_api.rip_disc(
                                 mkv_save_path, dvdTitle['index'])
 
-                            # Master_and_Commander_De_l'autre_côté_du_monde_t00.mkv become
-                            # Master_and_Commander_De_l_autre_cote_du_monde_t00.mkv
-                            log.debug('Rename {} to {}'.format(
-                                os.path.join(dbvideo.path, dvdTitle['title']),
-                                os.path.join(dbvideo.path, dvdTitle['rename_title'])
-                            ))
-                            os.rename(
-                                os.path.join(dbvideo.path, dvdTitle['title']),
-                                os.path.join(dbvideo.path, dvdTitle['rename_title'])
-                            )
-
                         if status:
-                            log.info("It took {} minute(s) to complete the ripping of {} from {}".format(
+                            log.info(u"It took {} minute(s) to complete the ripping of {} from {}".format(
                                 t.minutes,
                                 dvdTitle['title'],
                                 disc_title
@@ -233,7 +223,7 @@ def rip(config):
                         "Try decreasing 'minLength' in the config and try again")
 
             else:
-                log.info("Video folder {} already exists".format(disc_title))
+                log.info(u"Video folder {} already exists".format(disc_title))
 
     else:
         log.info("Could not find any DVDs in drive list")
@@ -255,7 +245,7 @@ def skip_compress(config):
     for dbvideo in dbvideos:
         if comp.check_exists(dbvideo) is not False:
             database.update_video(dbvideo, 6)
-            log.info("Skipping compression for {} from {}" .format(
+            log.info(u"Skipping compression for {} from {}" .format(
                 dbvideo.filename, dbvideo.vidname))
 
 
@@ -275,14 +265,11 @@ def compress(config):
     dbvideos = database.next_video_to_compress()
 
     for dbvideo in dbvideos:
-        dbvideo.filename = utils.strip_accents(dbvideo.filename)
-        dbvideo.filename = utils.clean_special_chars(dbvideo.filename)
-
         if comp.check_exists(dbvideo) is not False:
 
             database.update_video(dbvideo, 5)
 
-            log.info("Compressing {} from {}" .format(
+            log.info(u"Compressing {} from {}" .format(
                 dbvideo.filename, dbvideo.vidname))
 
             with stopwatch.StopWatch() as t:
@@ -295,7 +282,7 @@ def compress(config):
             if status:
                 log.info("Video was compressed and encoded successfully")
 
-                log.info("It took {} minutes to compress {}".format(
+                log.info(u"It took {} minutes to compress {}".format(
                     t.minutes, dbvideo.filename
                 )
                 )
@@ -376,7 +363,7 @@ def extras(config):
                     log.info("Subtitles not downloaded, no match")
                     database.update_video(dbvideo, 8)
 
-                log.info("Completed work on {}".format(dbvideo.vidname))
+                log.info(u"Completed work on {}".format(dbvideo.vidname))
 
                 if config['commands'] is not None and len(config['commands']) > 0:
                     for com in config['commands']:
@@ -394,7 +381,7 @@ def extras(config):
             if 'extra' in config['notification']['notify_on_state']:
                 notify.extra_complete(dbvideo)
 
-            log.debug("Attempting to delete %s" % dbvideo.path)
+            log.debug(u"Attempting to delete %s" % dbvideo.path)
 
             try:
                 os.rmdir(dbvideo.path)

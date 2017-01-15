@@ -14,6 +14,7 @@ Copyright (c) 2012, Jason Millward
 
 import re
 import subprocess
+
 import logger
 
 
@@ -45,14 +46,14 @@ class FileBot(object):
             [
                 'filebot',
                 '-rename',
-                "%s/%s" % (dbvideo.path, dbvideo.filename),
+                u'%s/%s' % (dbvideo.path, dbvideo.filename),
                 '--q',
-                "\"%s\"" % vidname,
+                u'"%s"' % vidname,
                 '-non-strict',
                 '--db',
-                '%s' % db,
+                u'%s' % db,
                 '--output',
-                "%s" % movePath
+                u'%s' % movePath
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
@@ -101,9 +102,9 @@ class FileBot(object):
             [
                 'filebot',
                 '-get-subtitles',
-                dbvideo.path,
+                u'"%s"' % dbvideo.path,
                 '--q',
-                "\"%s\"" % dbvideo.vidname,
+                u'"%s"' % dbvideo.vidname,
                 '--lang',
                 lang,
                 '--output',

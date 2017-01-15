@@ -14,6 +14,7 @@ Copyright (c) 2012, Jason Millward
 
 import re
 import subprocess
+
 import database
 import logger
 
@@ -47,15 +48,15 @@ class HandBrake(object):
             vidname = re.sub(r'D(\d)', '', dbvideo.vidname)
             vidqty = database.search_video_name(vidname)
             if vidqty == 0:
-                vidname = "%sE1.%s" % (vidname, self.vformat)
+                vidname = u"%sE1.%s" % (vidname, self.vformat)
             else:
-                vidname = "%sE%s.%s" % (vidname, str(vidqty + 1), self.vformat)
+                vidname = u"%sE%s.%s" % (vidname, str(vidqty + 1), self.vformat)
         else:
-            vidname = "%s.%s" % (dbvideo.vidname, self.vformat)
+            vidname = u"%s.%s" % (dbvideo.vidname, self.vformat)
 
-        invid = "%s/%s" % (dbvideo.path, dbvideo.filename)
-        outvid = "%s/%s" % (dbvideo.path, vidname)
-        command = 'nice -n {0} {1}HandBrakeCLI --verbose -i "{2}" -o "{3}" {4}'.format(
+        invid = u"%s/%s" % (dbvideo.path, dbvideo.filename)
+        outvid = u"%s/%s" % (dbvideo.path, vidname)
+        command = u'nice -n {0} {1}HandBrakeCLI --verbose -i "{2}" -o "{3}" {4}'.format(
             nice,
             self.compressionPath,
             invid,

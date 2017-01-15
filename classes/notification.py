@@ -42,25 +42,25 @@ class Notification(object):
 
     def rip_complete(self, dbvideo):
 
-        status = 'Rip of %s complete' % dbvideo.vidname
+        status = u'Rip of %s complete' % dbvideo.vidname
         self._send(status)
 
     def rip_fail(self, dbvideo):
 
-        status = 'Rip of %s failed' % dbvideo.vidname
+        status = u'Rip of %s failed' % dbvideo.vidname
         self._send(status)
 
     def compress_complete(self, dbvideo):
 
-        status = 'Compress of %s complete' % dbvideo.vidname
+        status = u'Compress of %s complete' % dbvideo.vidname
         self._send(status)
 
     def compress_fail(self, dbvideo):
 
-        status = 'Compress of %s failed' % dbvideo.vidname
+        status = u'Compress of %s failed' % dbvideo.vidname
         self._send(status)
 
     def extra_complete(self, dbvideo):
 
-        status = 'Extra of %s complete' % dbvideo.vidname
+        status = u'Extra of %s complete' % dbvideo.vidname
         self._send(status)

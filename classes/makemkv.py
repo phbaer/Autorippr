@@ -20,8 +20,6 @@ import time
 
 import logger
 
-import utils
-
 
 class MakeMKV(object):
 
@@ -315,33 +313,30 @@ class MakeMKV(object):
                 ).total_seconds()
 
                 if self.vidType == "tv" and titleDur > self.maxLength:
-                    self.log.debug("Excluding Title No.: {}, Title: {}. Exceeds maxLength".format(
+                    self.log.debug(u"Excluding Title No.: {}, Title: {}. Exceeds maxLength".format(
                         titleNo,
                         self._read_mkv_messages("TINFO", titleNo, 27)
                     ))
                     continue
 
                 if self.vidType == "movie" and not re.search('00', self._read_mkv_messages("TINFO", titleNo, 27)[0]):
-                    self.log.debug("Excluding Title No.: {}, Title: {}. Only want first title".format(
+                    self.log.debug(u"Excluding Title No.: {}, Title: {}. Only want first title".format(
                         titleNo,
                         self._read_mkv_messages("TINFO", titleNo, 27)
                     ))
                     continue
 
-                self.log.debug("MakeMKV title info: Disc Title: {}, Title No.: {}, Title: {}, ".format(
+                self.log.debug(u"MakeMKV title info: Disc Title: {}, Title No.: {}, Title: {}, ".format(
                     self._read_mkv_messages("CINFO", 2),
                     titleNo,
                     self._read_mkv_messages("TINFO", titleNo, 27)
                 ))
 
                 title = self._read_mkv_messages("TINFO", titleNo, 27)[0]
-                rename_title = utils.strip_accents(title)
-                rename_title = utils.clean_special_chars(rename_title)
 
                 self.saveFiles.append({
                     'index': titleNo,
                     'title': title,
-                    'rename_title': rename_title,
                 })
 
     def get_type(self):
@@ -359,10 +354,10 @@ class MakeMKV(object):
         )
 
         if titlePattern.search(self.vidName):
-            self.log.debug("Detected TV {}".format(self.vidName))
+            self.log.debug(u"Detected TV {}".format(self.vidName))
             self.vidType = "tv"
         else:
-            self.log.debug("Detected movie {}".format(self.vidName))
+            self.log.debug(u"Detected movie {}".format(self.vidName))
             self.vidType = "movie"
         return self.vidType
 

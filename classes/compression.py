@@ -91,4 +91,4 @@ class Compression(object):
             try:
                 os.remove(self.invid)
             except:
-                self.log.error("Could not remove %s" % self.invid)
+                self.log.error(u"Could not remove %s" % self.invid)
