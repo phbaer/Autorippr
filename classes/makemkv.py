@@ -145,7 +145,7 @@ class MakeMKV(object):
         """
         self.path = path
 
-        fullpath = '%s/%s' % (self.path, self.vidName)
+        fullpath = u'%s/%s' % (self.path, self.vidName)
 
         proc = subprocess.Popen(
             [
