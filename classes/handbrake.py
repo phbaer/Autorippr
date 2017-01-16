@@ -76,8 +76,14 @@ class HandBrake(object):
             self.log.error(
                 "HandBrakeCLI (compress) returned status code: %d" % proc.returncode)
 
+        if results is not None:
+            results = results.decode('utf-8')
+
+        #if errors is not None:
+        #    errors = errors.decode('utf-8')
+
         if results is not None and len(results) is not 0:
-            lines = results.split("\n")
+            lines = results.split(u"\n")
             for line in lines:
                 if "Encoding: task" not in line:
                     self.log.debug(line.strip())
@@ -99,7 +105,7 @@ class HandBrake(object):
             self.log.debug("HandBrakeCLI Completed successfully")
 
             database.update_video(
-                dbvideo, 6, filename="%s" % (
+                dbvideo, 6, filename=u"%s" % (
                     vidname
                 ))
 

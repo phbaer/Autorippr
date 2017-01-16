@@ -68,12 +68,18 @@ class FileBot(object):
         renamedvideo = ""
         checks = 0
 
+        if results is not None:
+            results = results.decode('utf-8')
+
+        #if errors is not None:
+        #    errors = errors.decode('utf-8')
+
         if len(results) is not 0:
-            lines = results.split("\n")
+            lines = results.split(u"\n")
             for line in lines:
                 self.log.debug(line.strip())
                 if "MOVE" in line:
-                    renamedvideo = line.split("] to [", 1)[1].rstrip(']')
+                    renamedvideo = line.split(u"] to [", 1)[1].rstrip(']')
                     checks += 1
 
                 if "Processed" in line:
@@ -125,8 +131,14 @@ class FileBot(object):
 
         checks = 0
 
+        if results is not None:
+            results = results.decode('utf-8')
+
+        #if errors is not None:
+        #    errors = errors.decode('utf-8')
+
         if len(results) is not 0:
-            lines = results.split("\n")
+            lines = results.split(u"\n")
             for line in lines:
                 self.log.debug(line.strip())
 

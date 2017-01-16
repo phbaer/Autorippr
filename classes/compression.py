@@ -67,7 +67,7 @@ class Compression(object):
                 Bool    Does file exist
 
         """
-        self.invid = "%s/%s" % (dbvideo.path, dbvideo.filename)
+        self.invid = u"%s/%s" % (dbvideo.path, dbvideo.filename)
 
         if os.path.isfile(self.invid):
             return True
