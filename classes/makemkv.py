@@ -60,17 +60,19 @@ class MakeMKV(object):
         # Clean up the edges and remove whitespace
         self.vidName = tmpname.strip()
 
-    def _remove_duplicates(self, title_list):
+    @staticmethod
+    def _remove_duplicates(title_list):
         seen_titles = set()
         new_list = []
         for obj in title_list:
-            if obj['title'] not in seen_titles:
+            if obj['filename'] not in seen_titles:
                 new_list.append(obj)
-                seen_titles.add(obj['title'])
+                seen_titles.add(obj['filename'])
 
         return new_list
 
-    def _read_mkv_messages(self, stype, sid=None, scode=None):
+    @staticmethod
+    def _read_mkv_messages(stype, sid=None, scode=None):
         """
             Returns a list of messages that match the search string
             Parses message output.
@@ -81,29 +83,34 @@ class MakeMKV(object):
                 scode   (Int): Code of message
 
             Outputs:
-                toreturn    (List)
+                result  (List)
         """
-        toreturn = []
+        result = []
 
         with codecs.open('/tmp/makemkvMessages', 'r', 'utf-8') as messages:
             for line in messages:
-                if line[:len(stype)] == stype:
-                    values = line.replace(u"%s:" % stype, u"").strip()
+                element = None
 
-                    cr = values.split(u',')
+                if line[:len(stype)] == stype:
+                    values = line[len(stype)+1:].strip().split(',')
 
                     if sid is not None:
-                        if int(cr[0]) == int(sid):
+                        if int(values[0]) == int(sid):
                             if scode is not None:
-                                if int(cr[1]) == int(scode):
-                                    toreturn.append(cr[3].strip('"'))
+                                if int(values[1]) == int(scode):
+                                    element = values[3]
                             else:
-                                toreturn.append(cr[2].strip('"'))
+                                element = values[2]
 
                     else:
-                        toreturn.append(cr[0].strip('"'))
+                        element = values[0]
 
-        return toreturn
+                element = element.strip('"')
+
+                if element not in result:
+                    result.append(element)
+
+        return result
 
     def set_title(self, vidname):
         """
@@ -319,12 +326,14 @@ class MakeMKV(object):
         self.log.debug("MakeMKV found {} titles".format(foundtitles))
 
         if foundtitles > 0:
-            for titleNo in set(self._read_mkv_messages("TINFO")):
-                title = self._read_mkv_messages("TINFO", titleNo, 27)
+            for titleNo in self._read_mkv_messages("TINFO"):
+                disc_title = self._read_mkv_messages("CINFO", 2)[0].title()
+                title = self._read_mkv_messages("TINFO", titleNo, 2)[0].title()
+                filename = self._read_mkv_messages("TINFO", titleNo, 27)[0]
                 chapters = self._read_mkv_messages("TINFO", titleNo, 8)
 
-                if ((len(chapters) == 0) or (int(chapters[0]) == 0)):
-                    self.log.info(u"Skipping title {} because it does not have any chapters").format(title)
+                if (len(chapters) == 0) or (int(chapters[0]) == 0):
+                    self.log.debug(u"Skipping title {} ({}) because there are not chapters defined".format(titleNo, title))
                     continue
 
                 durTemp = self._read_mkv_messages("TINFO", titleNo, 9)[0]
@@ -336,30 +345,19 @@ class MakeMKV(object):
                 ).total_seconds()
 
                 if self.vidType == "tv" and titleDur > self.maxLength:
-                    self.log.debug(u"Excluding Title No.: {}, Title: {}. Exceeds maxLength".format(
-                        titleNo,
-                        title
-                    ))
+                    self.log.debug(u"Excluding title {} ({}). Exceeds maxLength".format(titleNo, title))
                     continue
 
-                if self.vidType == "movie" and not re.search('00', self._read_mkv_messages("TINFO", titleNo, 27)[0]):
-                    self.log.debug(u"Excluding Title No.: {}, Title: {}. Only want first title".format(
-                        titleNo,
-                        title
-                    ))
+                rip_filename = self._read_mkv_messages("TINFO", titleNo, 27)[0]
+                if self.vidType == "movie" and not re.search('t00', rip_filename):
+                    self.log.debug(u"Excluding title {} ({}), only the first title is extracted.".format(titleNo, title))
                     continue
 
-                self.log.debug(u"MakeMKV title info: Disc Title: {}, Title No.: {}, Title: {}, ".format(
-                    self._read_mkv_messages("CINFO", 2),
-                    titleNo,
-                    title
-                ))
-
-                title = self._read_mkv_messages("TINFO", titleNo, 27)[0]
+                self.log.debug(u"{}: {} ({})".format(disc_title, titleNo, title))
 
                 self.saveFiles.append({
                     'index': titleNo,
-                    'title': title,
+                    'title': filename
                 })
 
     def get_type(self):
