@@ -65,7 +65,7 @@ class MakeMKV(object):
         seen_titles = set()
         new_list = []
         for obj in title_list:
-            if obj['filename'] not in seen_titles:
+            if obj['title'] not in seen_titles:
                 new_list.append(obj)
                 seen_titles.add(obj['title'])
 
