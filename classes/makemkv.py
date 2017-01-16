@@ -105,10 +105,11 @@ class MakeMKV(object):
                     else:
                         element = values[0]
 
-                element = element.strip('"')
+                if element is not None:
+                    element = element.strip('"')
 
-                if element not in result:
-                    result.append(element)
+                    if element not in result:
+                        result.append(element)
 
         return result
 
