@@ -24,7 +24,7 @@ class Logger(object):
 
         frmt = logging.Formatter(
             u'%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            u'Y-%m-%d %H:%M:%S'
+            u'%Y-%m-%d %H:%M:%S'
         )
 
         if debug:
