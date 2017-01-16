@@ -334,7 +334,7 @@ class MakeMKV(object):
                 chapters = self._read_mkv_messages("TINFO", titleNo, 8)
 
                 if (len(chapters) == 0) or (int(chapters[0]) == 0):
-                    self.log.debug(u"Skipping title {} ({}) because there are not chapters defined".format(titleNo, title))
+                    self.log.debug(u"Skipping title {} ({}) because chapters found.".format(titleNo, title))
                     continue
 
                 durTemp = self._read_mkv_messages("TINFO", titleNo, 9)[0]
