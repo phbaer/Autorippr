@@ -12,12 +12,12 @@ Copyright (c) 2012, Jason Millward
 @license    http://opensource.org/licenses/MIT
 """
 
-import csv
+import codecs
 import datetime
 import re
 import subprocess
 import time
-import codecs
+
 import logger
 
 
@@ -320,6 +320,13 @@ class MakeMKV(object):
 
         if foundtitles > 0:
             for titleNo in set(self._read_mkv_messages("TINFO")):
+                title = self._read_mkv_messages("TINFO", titleNo, 27)
+                chapters = self._read_mkv_messages("TINFO", titleNo, 8)
+
+                if ((len(chapters) == 0) or (int(chapters[0]) == 0)):
+                    self.log.info(u"Skipping title {} because it does not have any chapters").format(title)
+                    continue
+
                 durTemp = self._read_mkv_messages("TINFO", titleNo, 9)[0]
                 x = time.strptime(durTemp, u'%H:%M:%S')
                 titleDur = datetime.timedelta(
@@ -331,21 +338,21 @@ class MakeMKV(object):
                 if self.vidType == "tv" and titleDur > self.maxLength:
                     self.log.debug(u"Excluding Title No.: {}, Title: {}. Exceeds maxLength".format(
                         titleNo,
-                        self._read_mkv_messages("TINFO", titleNo, 27)
+                        title
                     ))
                     continue
 
                 if self.vidType == "movie" and not re.search('00', self._read_mkv_messages("TINFO", titleNo, 27)[0]):
                     self.log.debug(u"Excluding Title No.: {}, Title: {}. Only want first title".format(
                         titleNo,
-                        self._read_mkv_messages("TINFO", titleNo, 27)
+                        title
                     ))
                     continue
 
                 self.log.debug(u"MakeMKV title info: Disc Title: {}, Title No.: {}, Title: {}, ".format(
                     self._read_mkv_messages("CINFO", 2),
                     titleNo,
-                    self._read_mkv_messages("TINFO", titleNo, 27)
+                    title
                 ))
 
                 title = self._read_mkv_messages("TINFO", titleNo, 27)[0]
