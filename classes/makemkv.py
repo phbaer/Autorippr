@@ -376,11 +376,12 @@ class MakeMKV(object):
                     self.log.debug(u"Excluding title {} ({}), only the first title is extracted.".format(makemkvTitleNo, title))
                     continue
 
-                self.log.debug(u"{}: {} ({})".format(disc_title, makemkvTitleNo, title))
+                realTitleNo = transposition[makemkvTitleNo],
+                self.log.debug(u"{}: {}=>{} ({})".format(disc_title, makemkvTitleNo, realTitleNo, title))
 
                 self.saveFiles.append({
                     'index': makemkvTitleNo,
-                    'realIndex': transposition[makemkvTitleNo],
+                    'realIndex': realTitleNo,
                     'title': filename
                 })
 
