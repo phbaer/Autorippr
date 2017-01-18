@@ -130,7 +130,7 @@ def rip(config):
     log.debug("Ripping initialised")
     mkv_api = makemkv.MakeMKV(config)
 
-    log.debug("Checking for DVDs")
+    log.debug("Checking for disks")
     dvds = mkv_api.find_disc()
 
     log.debug("{} disk(s) found".format(len(dvds)))

@@ -375,7 +375,7 @@ class MakeMKV(object):
                     self.log.debug(u"Excluding title {} ({}), only the first title is extracted.".format(makemkvTitleNo, title))
                     continue
 
-                realTitleNo = transposition[int(makemkvTitleNo)],
+                realTitleNo = int(transposition[int(makemkvTitleNo)]),
                 self.log.debug(u"{}: {}=>{} ({})".format(disc_title, makemkvTitleNo, realTitleNo, title))
 
                 self.saveFiles.append({
