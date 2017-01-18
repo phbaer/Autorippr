@@ -156,12 +156,11 @@ def rip(config):
                     filebot = config['filebot']['enable']
 
                     for dvdTitle in saveFiles:
-
                         dbvideo = database.insert_video(
                             disc_title,
                             disc_path,
                             disc_type,
-                            dvdTitle['index'],
+                            dvdTitle['realIndex'],
                             filebot
                         )
 

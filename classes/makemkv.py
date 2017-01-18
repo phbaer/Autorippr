@@ -72,12 +72,13 @@ class MakeMKV(object):
         return new_list
 
     @staticmethod
-    def _read_mkv_messages(stype, sid=None, scode=None):
+    def _read_mkv_messages(index, stype, sid=None, scode=None):
         """
             Returns a list of messages that match the search string
             Parses message output.
 
             Inputs:
+                index   (Int): Element to return from input string (all: None)
                 stype   (Str): Type of message
                 sid     (Int): ID of message
                 scode   (Int): Code of message
@@ -89,26 +90,30 @@ class MakeMKV(object):
 
         with codecs.open('/tmp/makemkvMessages', 'r', 'utf-8') as messages:
             for line in messages:
-                element = None
-
                 if line[:len(stype)] == stype:
-                    values = line[len(stype)+1:].strip().split(',')
+                    temp = line[len(stype)+1:].strip().split(',')
+
+                    values = []
+                    for value in temp:
+                        values.append(temp.strip('" '))
+
+                    element = None
+                    if index is None:
+                        element = values
+                    elif index >= len(values):
+                        element = values[index]
+                    else:
+                        continue
 
                     if sid is not None:
-                        if int(values[0]) == int(sid):
-                            if scode is not None:
-                                if int(values[1]) == int(scode):
-                                    element = values[3]
-                            else:
-                                element = values[2]
+                        if int(values[0]) != int(sid):
+                            continue
 
-                    else:
-                        element = values[0]
+                        if scode is not None:
+                            if int(values[1]) != int(scode):
+                                continue
 
-                if element is not None:
-                    element = element.strip('"')
-
-                    if element not in result:
+                    if element is not None and element not in result:
                         result.append(element)
 
         return result
@@ -322,22 +327,40 @@ class MakeMKV(object):
                 self.log.error(errors)
                 return False
 
-        foundtitles = int(self._read_mkv_messages("TCOUNT")[0])
+        foundtitles = int(self._read_mkv_messages(0, "TCOUNT")[0])
+
+        index = 0
+        addedTitles = []
+        for title in self._read_mkv_messages(5, "MSG", 3307):
+            if len(title) is 0:
+                continue
+
+            addedTitles.append((title, index))
+            index += 1
+
+        addedTitlesSorted = addedTitles[:]
+        addedTitlesSorted.sort()
+
+        index = 0
+        transposition = {}
+        for titleTuple in addedTitlesSorted:
+            transposition[titleTuple[1]] = index
+            index += 1
 
         self.log.debug("MakeMKV found {} titles".format(foundtitles))
 
         if foundtitles > 0:
-            for titleNo in self._read_mkv_messages("TINFO"):
-                disc_title = self._read_mkv_messages("CINFO", 2)[0].title()
-                title = self._read_mkv_messages("TINFO", titleNo, 2)[0].title()
-                filename = self._read_mkv_messages("TINFO", titleNo, 27)[0]
-                chapters = self._read_mkv_messages("TINFO", titleNo, 8)
+            for makemkvTitleNo in self._read_mkv_messages(0, "TINFO"):
+                disc_title = self._read_mkv_messages(2, "CINFO", 2)[0].title()
+                title = self._read_mkv_messages(3, "TINFO", makemkvTitleNo, 2)[0].title()
+                filename = self._read_mkv_messages(3, "TINFO", makemkvTitleNo, 27)[0]
+                chapters = self._read_mkv_messages(3, "TINFO", makemkvTitleNo, 8)
 
                 if (len(chapters) == 0) or (int(chapters[0]) == 0):
-                    self.log.debug(u"Skipping title {} ({}) because chapters found.".format(titleNo, title))
+                    self.log.debug(u"Skipping title {} ({}) because chapters found.".format(makemkvTitleNo, title))
                     continue
 
-                durTemp = self._read_mkv_messages("TINFO", titleNo, 9)[0]
+                durTemp = self._read_mkv_messages(3, "TINFO", makemkvTitleNo, 9)[0]
                 x = time.strptime(durTemp, u'%H:%M:%S')
                 titleDur = datetime.timedelta(
                     hours=x.tm_hour,
@@ -346,18 +369,18 @@ class MakeMKV(object):
                 ).total_seconds()
 
                 if self.vidType == "tv" and titleDur > self.maxLength:
-                    self.log.debug(u"Excluding title {} ({}). Exceeds maxLength".format(titleNo, title))
+                    self.log.debug(u"Excluding title {} ({}). Exceeds maxLength".format(makemkvTitleNo, title))
                     continue
 
-                rip_filename = self._read_mkv_messages("TINFO", titleNo, 27)[0]
-                if self.vidType == "movie" and not re.search('t00', rip_filename):
-                    self.log.debug(u"Excluding title {} ({}), only the first title is extracted.".format(titleNo, title))
+                if self.vidType == "movie" and not re.search('t00', filename):
+                    self.log.debug(u"Excluding title {} ({}), only the first title is extracted.".format(makemkvTitleNo, title))
                     continue
 
-                self.log.debug(u"{}: {} ({})".format(disc_title, titleNo, title))
+                self.log.debug(u"{}: {} ({})".format(disc_title, makemkvTitleNo, title))
 
                 self.saveFiles.append({
-                    'index': titleNo,
+                    'index': makemkvTitleNo,
+                    'realIndex': transposition[makemkvTitleNo],
                     'title': filename
                 })
 
