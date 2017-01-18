@@ -97,10 +97,9 @@ class MakeMKV(object):
                     for value in temp:
                         values.append(value.strip('" '))
 
-                    element = None
                     if index is None:
                         element = values
-                    elif index >= len(values):
+                    elif index < len(values):
                         element = values[index]
                     else:
                         continue
