@@ -133,7 +133,7 @@ def rip(config):
     log.debug("Checking for DVDs")
     dvds = mkv_api.find_disc()
 
-    log.debug("{} DVD(s) found".format(len(dvds)))
+    log.debug("{} disk(s) found".format(len(dvds)))
 
     if len(dvds) > 0:
         # Best naming convention ever
