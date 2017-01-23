@@ -79,8 +79,8 @@ class HandBrake(object):
         if results is not None:
             results = results.decode('utf-8')
 
-        #if errors is not None:
-        #    errors = errors.decode('utf-8')
+        # if errors is not None:
+        #     errors = errors.decode('utf-8')
 
         if results is not None and len(results) is not 0:
             lines = results.split(u"\n")

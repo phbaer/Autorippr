@@ -22,7 +22,6 @@ database = SqliteDatabase('%s/autorippr.sqlite' % DIR, **{})
 
 
 class BaseModel(Model):
-
     class Meta:
         database = database
 
@@ -119,7 +118,7 @@ def create_status_types():
 
 def next_video_to_compress():
     videos = Videos.select().where((Videos.statusid == 4) & (
-        Videos.filename != "None")).order_by(Videos.vidname)
+        Videos.filename != "None")).order_by(Videos.titleIndex)
     return videos
 
 
@@ -173,5 +172,6 @@ def db_integrity_check():
     # Things
     create_history_types()
     create_status_types()
+
 
 db_integrity_check()
