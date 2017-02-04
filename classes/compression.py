@@ -52,7 +52,7 @@ class Compression(object):
             )
 
     def compress(self, **args):
-        self.log.debug('FFmpeg args: {}'.format(args))
+        self.log.debug('Compression args: {}'.format(args))
         return self.method.compress(**args)
 
     def check_exists(self, dbvideo):

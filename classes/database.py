@@ -49,7 +49,7 @@ class Videos(BaseModel):
     vidid = PrimaryKeyField(db_column='vidID')
     vidname = CharField()
     vidtype = CharField()
-    titleindex = CharField(db_column='titleIndex')
+    titleIndex = CharField(db_column='titleIndex')
     path = CharField()
     filename = CharField(null=True)
     filebot = BooleanField()
