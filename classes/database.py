@@ -146,7 +146,7 @@ def insert_video(title, path, vidtype, index, filebot):
     return Videos.create(
         vidname=title,
         vidtype=vidtype,
-        titleindex=index,
+        titleIndex=index,
         path=path,
         filename="None",
         filebot=filebot,
