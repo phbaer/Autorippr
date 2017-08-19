@@ -17,6 +17,7 @@ import datetime
 import re
 import subprocess
 import time
+import os
 
 import logger
 
@@ -184,11 +185,20 @@ class MakeMKV(object):
             self.log.error(
                 "MakeMKV (rip_disc) returned status code: %d" % proc.returncode)
 
+        errorList = errors.split("\n")
         if errors is not None:
-            if len(errors) is not 0:
-                self.log.error("MakeMKV encountered the following error: ")
-                self.log.error(errors)
-                return False
+            for error in errorList:
+                error = error.strip()
+                if len(error) is not 0:
+                    if "Redirecting output to" in error:
+                        p = re.compile("Redirecting output to .(.*).\.")
+                        m = p.match(error)
+                        self.log.debug("Removing " + m.group(1))
+                        os.remove(m.group(1))
+                    else:
+                        self.log.error("MakeMKV encountered the following error: ")
+                        self.log.error(errors)
+                        return []
 
         checks = 0
 
@@ -249,15 +259,25 @@ class MakeMKV(object):
         if errors is not None:
             errors = errors.decode('utf-8')
 
+        self.log.info(results)
         if proc.returncode is not 0:
             self.log.error(
                 "MakeMKV (find_disc) returned status code: %d" % proc.returncode)
 
+        errorList = errors.split("\n")
         if errors is not None:
-            if len(errors) is not 0:
-                self.log.error("MakeMKV encountered the following error: ")
-                self.log.error(errors)
-                return []
+            for error in errorList:
+                error = error.strip()
+                if len(error) is not 0:
+                    if "Redirecting output to" in error:
+                        p = re.compile("Redirecting output to .(.*).\.")
+                        m = p.match(error)
+                        self.log.info("Removing " + m.group(1))
+                        os.remove(m.group(1))
+                    else:
+                        self.log.error("MakeMKV encountered the following error: ")
+                        self.log.error(errors)
+                        return []
 
         if "This application version is too old." in results:
             self.log.error("Your MakeMKV version is too old."
@@ -269,6 +289,7 @@ class MakeMKV(object):
         # Passed the simple tests, now check for disk drives
         lines = results.split(u"\n")
         for line in lines:
+            self.log.info(line)
             if line[:4] == "DRV:":
                 if "/dev/" in line:
                     out = line.split(u',')
@@ -320,11 +341,20 @@ class MakeMKV(object):
             self.log.error(
                 "MakeMKV (get_disc_info) returned status code: %d" % proc.returncode)
 
+        errorList = errors.split("\n")
         if errors is not None:
-            if len(errors) is not 0:
-                self.log.error("MakeMKV encountered the following error: ")
-                self.log.error(errors)
-                return False
+            for error in errorList:
+                error = error.strip()
+                if len(error) is not 0:
+                    if "Redirecting output to" in error:
+                        p = re.compile("Redirecting output to .(.*).\.")
+                        m = p.match(error)
+                        self.log.info("Removing " + m.group(1))
+                        os.remove(m.group(1))
+                    else:
+                        self.log.error("MakeMKV encountered the following error: ")
+                        self.log.error(errors)
+                        return []
 
         foundtitles = int(self._read_mkv_messages(0, "TCOUNT")[0])
 
