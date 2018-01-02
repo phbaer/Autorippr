@@ -376,6 +376,7 @@ class MakeMKV(object):
         transposition = {}
         for titleTuple in addedTitlesSorted:
             transposition[titleTuple[1]] = index
+            self.log.debug(u"Trans {} => {}".format(titleTuple[1], index))
             index += 1
 
         self.log.debug("MakeMKV found {} titles".format(foundtitles))
@@ -383,7 +384,10 @@ class MakeMKV(object):
         if foundtitles > 0:
             for makemkvTitleNo in self._read_mkv_messages(0, "TINFO"):
                 disc_title = self._read_mkv_messages(2, "CINFO", 2)[0].title()
-                title = self._read_mkv_messages(3, "TINFO", makemkvTitleNo, 2)[0].title()
+                if len(self._read_mkv_messages(3, "TINFO", makemkvTitleNo, 2)) > 0:
+                    title = self._read_mkv_messages(3, "TINFO", makemkvTitleNo, 2)[0].title()
+                else:
+                    title = disc_title
                 filename = self._read_mkv_messages(3, "TINFO", makemkvTitleNo, 27)[0]
                 chapters = self._read_mkv_messages(3, "TINFO", makemkvTitleNo, 8)
 
@@ -403,11 +407,14 @@ class MakeMKV(object):
                     self.log.debug(u"Excluding title {} ({}). Exceeds maxLength".format(makemkvTitleNo, title))
                     continue
 
-                if self.vidType == "movie" and not re.search('t00', filename):
+                if self.vidType == "movie" and not re.search('t\w*00', filename):
                     self.log.debug(u"Excluding title {} ({}), only the first title is extracted.".format(makemkvTitleNo, title))
                     continue
 
-                realTitleNo = int(transposition[int(makemkvTitleNo)]),
+                if len(transposition) > 0:
+                    realTitleNo = int(transposition[int(makemkvTitleNo)])
+                else:
+                    realTitleNo = makemkvTitleNo
                 self.log.debug(u"{}: {}=>{} ({})".format(disc_title, makemkvTitleNo, realTitleNo, title))
 
                 self.saveFiles.append({
